@@ -24,9 +24,10 @@
 - **Tác động:** `app/api/src/routes/meetings.ts`, `app/web/lib/api.ts`, `app/web/app/page.tsx`.
 - **ADR:** Không (không đổi architecture/schema).
 
-## 2026-06-04 — #1 Date display theo timezone local người xem
+## 2026-06-04 — #1 Date display theo JST tường minh (Asia/Tokyo)
 - **Bối cảnh:** `formatDate` format theo UTC → lệch ngày với họp sáng sớm (07:00 JST = 22:00 UTC hôm trước). DB lưu đúng.
-- **Quyết định:** Sửa display path (`formatDate` + edit-form prefill) dùng `toLocaleDateString('en-CA')` = ngày theo **TZ local người xem**. KHÔNG hardcode JST, KHÔNG đụng DB.
-- **Lý do / trade-off:** Minimal + đúng cho cả VN/JST trong app nội bộ. **Rủi ro đã ghi nhận:** nếu sau này cần "ngày họp chuẩn" cho báo cáo/audit theo JST hoặc reminder/notification → cần chuẩn hóa (field JST riêng hoặc hiển thị theo TZ cố định). Chấp nhận cho MVP nội bộ.
-- **Tác động:** `app/web/lib/api.ts`, `app/web/app/page.tsx`, `app/web/app/meetings/[id]/{page,edit/page}.tsx`, seed fixture.
+- **Quyết định ban đầu (Phase A):** dùng `toLocaleDateString('en-CA')` = TZ local người xem (đánh dấu `[OPEN]`: local vs JST).
+- **Quyết định cuối (Phase B, sau khi đọc spec-1):** đổi sang **`toLocaleDateString('en-CA', { timeZone: 'Asia/Tokyo' })`** — JST tường minh, độc lập TZ trình duyệt. Spec AC#3 yêu cầu rõ "không phụ thuộc TZ trình duyệt, luôn giả định JST" và khuyến nghị cách A; cách B (local) bị "không khuyến khích".
+- **Lý do / trade-off:** Local browser FAIL với người xem VN khi họp lúc 00:00–01:59 JST (verify: 00:30 JST → VN-local ra ngày hôm trước, JST đúng). JST tường minh khớp AC, vẫn minimal (1 dòng trong `formatDate`), không đụng DB/API.
+- **Tác động:** `app/web/lib/api.ts`, edit-form prefill (dùng lại `formatDate`), seed fixture.
 - **ADR:** Không.
