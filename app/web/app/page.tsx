@@ -50,8 +50,8 @@ export default function HomePage() {
               href={`/meetings/${m.id}`}
               className="flex items-center justify-between px-4 py-3 hover:bg-gray-50"
             >
-              <span className="font-medium">{m.title}</span>
-              <span className="text-sm text-gray-500 ml-4">
+              <span className="font-medium truncate min-w-0">{m.title}</span>
+              <span className="text-sm text-gray-500 ml-4 shrink-0">
                 {formatDate(m.meetingDate)}
               </span>
             </Link>
