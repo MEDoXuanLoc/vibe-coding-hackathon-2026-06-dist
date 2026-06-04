@@ -46,6 +46,17 @@ Chạy app thật (Docker), curl API + node logic + eyeball:
 
 **Known issues chưa fix (cố ý):** `POST /api/meetings` chưa validate input; form lưu đẩy date→UTC midnight (mất time-of-day, *ngày* vẫn đúng); #4 chưa sync query vào URL (gợi ý optional của spec) + chưa highlight match.
 
+## Security observations (pre-existing, deliberately not touched)
+
+Trong khi làm tôi audit toàn hệ thống và ghi nhận vài pre-existing gap — **KHÔNG do thay đổi của tôi tạo ra**:
+- `POST/PUT /api/meetings` chưa validate input (`// TODO` trong route) → field thiếu/sai kiểu → data rác / 500.
+- API không có **authentication/authorization** — ai cũng CRUD mọi note.
+- **CORS allow-all** (`app.use(cors())`).
+
+Tôi **chủ động KHÔNG sửa** vì: (1) ngoài scope 6 story; (2) sát deadline, chạm auth/validation dễ gây regression lớn; (3) nguyên tắc "sản phẩm chạy ổn định trong khung giờ > sửa hết technical debt". **Follow-up đề xuất:** task riêng cho input validation + auth (+ siết CORS) ở sprint sau.
+
+Thay đổi của tôi **không tạo lỗ hổng mới**: search dùng Prisma tham số hóa (no SQLi) + escape LIKE wildcard `% _ \`; UI dựa React auto-escape, không `dangerouslySetInnerHTML` (no XSS); không commit secret.
+
 ## AI context files you added
 
 **Dựng TRƯỚC event** (nạp context — hợp lệ): `CLAUDE.md`, `INSIGHT.md`, `docs/prompts/GROK_SYSTEM_INSTRUCTION.md` (+parts), `claude-grok.md`, `docs/prep/` (mini-specs, rubric, report/submission templates, git checklist).
@@ -74,7 +85,7 @@ Chạy app thật (Docker), curl API + node logic + eyeball:
 ## 2. AI delegation vs. own judgement
 
 **Delegated**: spec/DoD (Grok), implement + viết verify (Claude), review logic (Grok → bắt edge wildcard).
-**Decided myself**: ILIKE thay tsvector; defer #3 / skip #5 theo impact; đổi TZ-local→JST khi đọc spec thay vì nghe AT cũ.
+**Decided myself**: ILIKE thay tsvector; defer #3 / skip #5 theo impact; đổi TZ-local→JST khi đọc spec thay vì giữ lựa chọn cũ; **chủ động audit ra pre-existing security gaps (no input validation / no auth / CORS allow-all) nhưng quyết KHÔNG sửa sát giờ** — ghi nhận + đề xuất follow-up thay vì scope-creep gây regression. Đây là ranh giới human-judgment rõ nhất của tôi hôm nay: phân biệt "lỗi mới tạo ra" vs "technical debt có sẵn", và ưu tiên sản phẩm ổn định trong khung giờ.
 
 ## 3. Sticking points
 - TZ là chỗ tinh tế nhất: lựa chọn ban đầu (local) đúng về "không lệch" nhưng sai về "chuẩn JST" mà spec yêu cầu. Thoát bằng cách đọc kỹ AC + verify case 00:30 JST để thấy local fail.
