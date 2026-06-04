@@ -2,8 +2,11 @@ import type { Meeting } from './types'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
 
-export async function fetchMeetings(): Promise<Meeting[]> {
-  const res = await fetch(`${API_URL}/api/meetings`, { cache: 'no-store' })
+export async function fetchMeetings(q?: string): Promise<Meeting[]> {
+  const url = q
+    ? `${API_URL}/api/meetings?q=${encodeURIComponent(q)}`
+    : `${API_URL}/api/meetings`
+  const res = await fetch(url, { cache: 'no-store' })
   if (!res.ok) throw new Error('Failed to fetch meetings')
   return res.json()
 }

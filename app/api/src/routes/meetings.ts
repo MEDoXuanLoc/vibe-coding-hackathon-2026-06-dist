@@ -3,8 +3,21 @@ import { prisma } from '../lib/db'
 
 const router = Router()
 
-router.get('/', async (_req, res) => {
+router.get('/', async (req, res) => {
+  const q = (req.query.q as string | undefined)?.trim()
+  // Escape LIKE wildcards so a literal % or _ in the query is matched literally,
+  // not treated as a pattern (Prisma `contains` does not escape these).
+  const term = q ? q.replace(/[\\%_]/g, (c) => `\\${c}`) : undefined
+  const where = term
+    ? {
+        OR: [
+          { title: { contains: term, mode: 'insensitive' as const } },
+          { body: { contains: term, mode: 'insensitive' as const } },
+        ],
+      }
+    : {}
   const meetings = await prisma.meeting.findMany({
+    where,
     orderBy: { meetingDate: 'desc' },
   })
   res.json(meetings)
