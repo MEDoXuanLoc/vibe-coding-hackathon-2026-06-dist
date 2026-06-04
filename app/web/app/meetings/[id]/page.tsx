@@ -20,6 +20,8 @@ export default function MeetingDetailPage() {
   }, [id])
 
   async function handleDelete() {
+    // Deletion is irreversible (no soft-delete / restore), so confirm first.
+    if (!confirm('Delete this meeting? This cannot be undone.')) return
     await deleteMeeting(id)
     router.push('/')
   }
