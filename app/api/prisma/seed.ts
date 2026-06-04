@@ -4,6 +4,15 @@ const prisma = new PrismaClient()
 
 const sampleMeetings = [
   {
+    // Early-morning meeting (07:30 JST == 2026-04-19T22:30:00Z). Regression fixture for
+    // the date off-by-one bug: a UTC-based formatter shows 2026-04-19 instead of 2026-04-20.
+    title: 'Early Morning Standup (07:30 JST)',
+    body: `Quick early standup before the customer call.
+
+Verifies the meeting date renders as 2026-04-20 (JST/local), not the UTC day (2026-04-19).`,
+    meetingDate: new Date('2026-04-20T07:30:00+09:00'),
+  },
+  {
     title: 'Sprint Planning - Q2 Goals',
     body: `Discussed Q2 priorities and team capacity.
 

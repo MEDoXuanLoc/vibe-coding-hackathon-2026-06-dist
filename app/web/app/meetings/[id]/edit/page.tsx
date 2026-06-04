@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import { fetchMeeting, updateMeeting } from '@/lib/api'
+import { fetchMeeting, updateMeeting, formatDate } from '@/lib/api'
 
 export default function EditMeetingPage() {
   const router = useRouter()
@@ -18,7 +18,7 @@ export default function EditMeetingPage() {
     fetchMeeting(id).then((m) => {
       setTitle(m.title)
       setBody(m.body)
-      setMeetingDate(m.meetingDate.slice(0, 10))
+      setMeetingDate(formatDate(m.meetingDate))
       setLoaded(true)
     })
   }, [id])

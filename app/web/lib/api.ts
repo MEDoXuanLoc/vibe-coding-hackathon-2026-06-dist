@@ -49,5 +49,8 @@ export async function deleteMeeting(id: string): Promise<void> {
 }
 
 export function formatDate(isoString: string): string {
-  return new Date(isoString).toISOString().slice(0, 10)
+  // Format in the viewer's local timezone (YYYY-MM-DD). Using toISOString() here
+  // would format in UTC, showing the wrong calendar day for early-morning meetings
+  // (e.g. 07:00 JST == 22:00 UTC the previous day). 'en-CA' yields YYYY-MM-DD.
+  return new Date(isoString).toLocaleDateString('en-CA')
 }
